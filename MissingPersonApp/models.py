@@ -173,7 +173,6 @@ class MissingPerson(models.Model):
         ('Memory loss', 'Memory loss'),
         ('Shock', 'Shock'),
     ]
-    
 
     # missing person 
     full_name = models.CharField(max_length=255)
