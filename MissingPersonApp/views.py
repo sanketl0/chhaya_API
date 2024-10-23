@@ -2,11 +2,11 @@ from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import  MissingPerson, UndefinedMissingPerson, UnidentifiedBody, Volunteer ,Match
+from .models import  MissingPerson, UnidentifiedMissingPerson, UnidentifiedBody, Volunteer ,Match
 from .serializers import MissingPersonSerializer, UndefinedMissingpersonSerializer, UnidentifiedBodySerializer, VolunteerSerializer
 from django.core.exceptions import ObjectDoesNotExist
-from .models import Zone, Division, SubDivision, PoliceStation, Chowki, Hospital
-from .serializers import ZoneSerializer, DivisionSerializer, SubDivisionSerializer, PoliceStationSerializer, ChowkiSerializer, HospitalSerializer
+# from .models import Zone, Division, SubDivision, PoliceStation, Chowki, Hospital
+# from .serializers import ZoneSerializer, DivisionSerializer, SubDivisionSerializer, PoliceStationSerializer, ChowkiSerializer, HospitalSerializer
 from django.db.models import Q
 
 class VolunteerAPIView(APIView):
@@ -171,21 +171,21 @@ class MissingPersonAPIView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class UndefinedMissingPersonAPIView(APIView):
+class UnidentifiedMissingPersonMissingPersonAPIView(APIView):
 
     def get(self, request, undefined_missing_person_id=None):
         if undefined_missing_person_id is not None:
             try:
-                undefined_missing_person = UndefinedMissingPerson.objects.get(pk=undefined_missing_person_id, is_deleted=False)
+                undefined_missing_person = UnidentifiedMissingPerson.objects.get(pk=undefined_missing_person_id, is_deleted=False)
                 serializer = UndefinedMissingpersonSerializer(undefined_missing_person)
                 return Response(serializer.data)
-            except UndefinedMissingPerson.DoesNotExist:
+            except UnidentifiedMissingPerson.DoesNotExist:
                 return Response({"error": "Undefined missing person not found"}, status=status.HTTP_404_NOT_FOUND)
             except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         try:
-            undefined_missing_persons = UndefinedMissingPerson.objects.filter(is_deleted=False)
+            undefined_missing_persons = UnidentifiedMissingPerson.objects.filter(is_deleted=False)
             serializer = UndefinedMissingpersonSerializer(undefined_missing_persons, many=True)
             return Response(serializer.data)
         except Exception as e:
@@ -203,147 +203,147 @@ class UndefinedMissingPersonAPIView(APIView):
 
     def put(self, request, undefined_missing_person_id):
         try:
-            undefined_missing_person = UndefinedMissingPerson.objects.get(pk=undefined_missing_person_id, is_deleted=False)
+            undefined_missing_person = UnidentifiedMissingPerson.objects.get(pk=undefined_missing_person_id, is_deleted=False)
             serializer = UndefinedMissingpersonSerializer(undefined_missing_person, data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except UndefinedMissingPerson.DoesNotExist:
+        except UnidentifiedMissingPerson.DoesNotExist:
             return Response({"error": "Undefined missing person not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def delete(self, request, undefined_missing_person_id):
         try:
-            undefined_missing_person = UndefinedMissingPerson.objects.get(pk=undefined_missing_person_id, is_deleted=False)
+            undefined_missing_person = UnidentifiedMissingPerson.objects.get(pk=undefined_missing_person_id, is_deleted=False)
             undefined_missing_person.is_deleted = True
             undefined_missing_person.save()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        except UndefinedMissingPerson.DoesNotExist:
+        except UnidentifiedMissingPerson.DoesNotExist:
             return Response({"error": "Undefined missing person not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class ZoneView(APIView):
-    def get(self, request):
-        try:
-            zones = Zone.objects.all()
-            serializer = ZoneSerializer(zones, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+# class ZoneView(APIView):
+#     def get(self, request):
+#         try:
+#             zones = Zone.objects.all()
+#             serializer = ZoneSerializer(zones, many=True)
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#         except Exception as e:
+#             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def post(self, request):
-        try:
-            serializer = ZoneSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#     def post(self, request):
+#         try:
+#             serializer = ZoneSerializer(data=request.data)
+#             if serializer.is_valid():
+#                 serializer.save()
+#                 return Response(serializer.data, status=status.HTTP_201_CREATED)
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#         except Exception as e:
+#             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-# View to handle CRUD operations for Division
-class DivisionView(APIView):
-    def get(self, request):
-        try:
-            divisions = Division.objects.all()
-            serializer = DivisionSerializer(divisions, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+# # View to handle CRUD operations for Division
+# class DivisionView(APIView):
+#     def get(self, request):
+#         try:
+#             divisions = Division.objects.all()
+#             serializer = DivisionSerializer(divisions, many=True)
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#         except Exception as e:
+#             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def post(self, request):
-        try:
-            serializer = DivisionSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#     def post(self, request):
+#         try:
+#             serializer = DivisionSerializer(data=request.data)
+#             if serializer.is_valid():
+#                 serializer.save()
+#                 return Response(serializer.data, status=status.HTTP_201_CREATED)
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#         except Exception as e:
+#             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-# View to handle CRUD operations for SubDivision
-class SubDivisionView(APIView):
-    def get(self, request):
-        try:
-            sub_divisions = SubDivision.objects.all()
-            serializer = SubDivisionSerializer(sub_divisions, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+# # View to handle CRUD operations for SubDivision
+# class SubDivisionView(APIView):
+#     def get(self, request):
+#         try:
+#             sub_divisions = SubDivision.objects.all()
+#             serializer = SubDivisionSerializer(sub_divisions, many=True)
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#         except Exception as e:
+#             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def post(self, request):
-        try:
-            serializer = SubDivisionSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#     def post(self, request):
+#         try:
+#             serializer = SubDivisionSerializer(data=request.data)
+#             if serializer.is_valid():
+#                 serializer.save()
+#                 return Response(serializer.data, status=status.HTTP_201_CREATED)
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#         except Exception as e:
+#             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-# View to handle CRUD operations for Police Station
-class PoliceStationView(APIView):
-    def get(self, request):
-        try:
-            police_stations = PoliceStation.objects.all()
-            serializer = PoliceStationSerializer(police_stations, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+# # View to handle CRUD operations for Police Station
+# class PoliceStationView(APIView):
+#     def get(self, request):
+#         try:
+#             police_stations = PoliceStation.objects.all()
+#             serializer = PoliceStationSerializer(police_stations, many=True)
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#         except Exception as e:
+#             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def post(self, request):
-        try:
-            serializer = PoliceStationSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#     def post(self, request):
+#         try:
+#             serializer = PoliceStationSerializer(data=request.data)
+#             if serializer.is_valid():
+#                 serializer.save()
+#                 return Response(serializer.data, status=status.HTTP_201_CREATED)
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#         except Exception as e:
+#             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-# View to handle CRUD operations for Chowki (Outpost)
-class ChowkiView(APIView):
-    def get(self, request):
-        try:
-            chowkis = Chowki.objects.all()
-            serializer = ChowkiSerializer(chowkis, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+# # View to handle CRUD operations for Chowki (Outpost)
+# class ChowkiView(APIView):
+#     def get(self, request):
+#         try:
+#             chowkis = Chowki.objects.all()
+#             serializer = ChowkiSerializer(chowkis, many=True)
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#         except Exception as e:
+#             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def post(self, request):
-        try:
-            serializer = ChowkiSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#     def post(self, request):
+#         try:
+#             serializer = ChowkiSerializer(data=request.data)
+#             if serializer.is_valid():
+#                 serializer.save()
+#                 return Response(serializer.data, status=status.HTTP_201_CREATED)
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#         except Exception as e:
+#             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-# View to handle CRUD operations for Hospital
-class HospitalView(APIView):
-    def get(self, request):
-        try:
-            hospitals = Hospital.objects.all()
-            serializer = HospitalSerializer(hospitals, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+# # View to handle CRUD operations for Hospital
+# class HospitalView(APIView):
+#     def get(self, request):
+#         try:
+#             hospitals = Hospital.objects.all()
+#             serializer = HospitalSerializer(hospitals, many=True)
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#         except Exception as e:
+#             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def post(self, request):
-        try:
-            serializer = HospitalSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#     def post(self, request):
+#         try:
+#             serializer = HospitalSerializer(data=request.data)
+#             if serializer.is_valid():
+#                 serializer.save()
+#                 return Response(serializer.data, status=status.HTTP_201_CREATED)
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#         except Exception as e:
+#             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
@@ -355,53 +355,79 @@ class SearchAllMatches(APIView):
     def get(self, request):
         results = []
 
-        # Fetch all records
-        missing_people = MissingPerson.objects.all()
-        undefined_missing_people = UndefinedMissingPerson.objects.all()
-        unidentified_bodies = UnidentifiedBody.objects.all()
+        # Fetch all records, ensure no null full names
+        missing_people = MissingPerson.objects.exclude(full_name=None)
+        undefined_missing_people = UnidentifiedMissingPerson.objects.exclude(full_name=None)
+        unidentified_bodies = UnidentifiedBody.objects.exclude(full_name=None)
 
+        # Missing Person vs Undefined Missing Person
         for missing_person in missing_people:
-            # Match with UndefinedMissingPerson
             for undefined_missing_person in undefined_missing_people:
                 is_match, match_percentage = self.is_match_with_undefined_missing_person(missing_person, undefined_missing_person)
                 
                 if is_match:
-                    # Append to results for response
                     results.append({
-                        'missing_person Name': missing_person.full_name,
-                        'match_type': 'undefined_missing_person',
-                        'Unidentified Missing Person': undefined_missing_person.full_name,
-                        'match_percentage': match_percentage,
+                        'missing_person_name': missing_person.full_name,
+                        'match_type': 'Missing Person vs Undefined Missing Person',
+                        'undefined_missing_person_name': undefined_missing_person.full_name if is_match else "No Match",
+                        'match_percentage': match_percentage if is_match else 0
                     })
-
-                    # Save the match in the database
+                    # Save match result, ensuring foreign keys are valid
                     Match.objects.create(
-                        missing_person=missing_person,
-                        undefined_missing_person=undefined_missing_person,
-                        match_percentage=match_percentage
+                        missing_person=missing_person if is_match else None,
+                        undefined_missing_person=undefined_missing_person if is_match else None,
+                        match_percentage=match_percentage if is_match else 0
                     )
 
-            # Match with UnidentifiedBody
+            # Missing Person vs Unidentified Dead Body
             for unidentified_body in unidentified_bodies:
                 is_match, match_percentage = self.is_match_with_unidentified_body(missing_person, unidentified_body)
                 
-                if is_match: 
-                    # Append to results for response
+                if is_match:
                     results.append({
-                        'missing_person Name': missing_person.full_name,
-                        'match_type': 'unidentified_body',
-                        'body_Name': unidentified_body.full_name,
-                        'match_percentage': match_percentage,
+                        'missing_person_name': missing_person.full_name,
+                        'match_type': 'Missing Person vs Unidentified Dead Body',
+                        'unidentified_body_name': unidentified_body.full_name if is_match else "No Match",
+                        'match_percentage': match_percentage if is_match else 0
                     })
-
-                    # Save the match in the database
+                    # Save match result
                     Match.objects.create(
-                        missing_person=missing_person,
-                        unidentified_body=unidentified_body,
-                        match_percentage=match_percentage
+                        missing_person=missing_person if is_match else None,
+                        unidentified_body=unidentified_body if is_match else None,
+                        match_percentage=match_percentage if is_match else 0
                     )
 
-        return JsonResponse(results, safe=False)
+        # Undefined Missing Person vs Unidentified Dead Body
+        for undefined_missing_person in undefined_missing_people:
+            for unidentified_body in unidentified_bodies:
+                is_match, match_percentage = self.is_match_between_undefined_missing_person_and_unidentified_body(undefined_missing_person, unidentified_body)
+                
+                if is_match:
+                    results.append({
+                        'undefined_missing_person_name': undefined_missing_person.full_name,
+                        'match_type': 'Undefined Missing Person vs Unidentified Dead Body',
+                        'unidentified_body_name': unidentified_body.full_name if is_match else "No Match",
+                        'match_percentage': match_percentage if is_match else 0
+                    })
+                    # Save match result
+                    Match.objects.create(
+                        undefined_missing_person=undefined_missing_person if is_match else None,
+                        unidentified_body=unidentified_body if is_match else None,
+                        match_percentage=match_percentage if is_match else 0
+                    )
+
+        # Response logic
+        if not results:
+            return JsonResponse({
+                'message': 'No matches found',
+                'results': results  
+            })
+
+        return JsonResponse({
+            'message': 'Matches found',
+            'results': results
+        }, safe=False)
+
     
     def is_match_with_undefined_missing_person(self, missing_person, UndefinedMissingPerson):
         match_score = 0
@@ -499,9 +525,9 @@ class SearchAllMatches(APIView):
             if missing_person.identification_card_no == UndefinedMissingPerson.identification_details:
                 match_score += 1
         
-        if missing_person.Condition and UndefinedMissingPerson.Condition:
+        if missing_person.Condition and UndefinedMissingPerson.condition_at_discovery:
             total_checks += 1
-            if missing_person.Condition == UndefinedMissingPerson.Condition:
+            if missing_person.Condition == UndefinedMissingPerson.condition_at_discovery:
                 match_score += 1
 
         # Match percentage
@@ -603,6 +629,20 @@ class SearchAllMatches(APIView):
         match_percentage = (match_score / total_checks) * 100 if total_checks > 0 else 0
         return match_percentage >= 50, match_percentage
 
+    def is_match_between_undefined_missing_person_and_unidentified_body(self, undefined_missing_person, unidentified_body):
+        match_score = 0
+        total_checks = 0
+
+        if undefined_missing_person.full_name and unidentified_body.full_name:
+            total_checks += 1
+            if undefined_missing_person.full_name.lower() == unidentified_body.full_name.lower():
+                match_score += 1  # Exact match
+
+        
+
+        # Calculate match percentage
+        match_percentage = (match_score / total_checks) * 100 if total_checks > 0 else 0
+        return match_percentage >= 50, match_percentage  # Return if it's a match and the match percentage
 
 
     

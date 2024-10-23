@@ -67,7 +67,7 @@ WSGI_APPLICATION = 'ChhayaProject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'chhaya', 
+        'NAME': 'chhayaAPI', 
         'USER': 'postgres', 
         'PASSWORD': 'Sanket@123', 
         'HOST': 'localhost',  
@@ -118,3 +118,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.1.37']

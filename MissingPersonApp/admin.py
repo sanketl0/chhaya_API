@@ -1,6 +1,6 @@
 from ast import Match
 from django.contrib import admin
-from .models import MissingPerson, UndefinedMissingPerson, UnidentifiedBody, Volunteer, Contact, Address,Match
+from .models import MissingPerson, UnidentifiedMissingPerson, UnidentifiedBody, Volunteer, Contact, Address,Match
 
 
 
@@ -51,15 +51,15 @@ class MissingPersonAdmin(admin.ModelAdmin):
         'height',
         'weight',
         'missing_date',
-        'is_deleted',
+       
     )
     search_fields = ('full_name', 'reportingperson_name', 'fir_number')
-    list_filter = ('gender', 'blood_group', 'missing_date', 'is_deleted')
+    list_filter = ('gender', 'blood_group', 'missing_date', )
     ordering = ('-missing_date',)
-    list_editable = ('is_deleted',)
+    
 
 
-class UndefinedMissingPersonAdmin(admin.ModelAdmin):
+class UnidentifiedMissingPersonAdmin(admin.ModelAdmin):
     list_display = (
         'full_name',
         'estimated_age',
@@ -69,9 +69,10 @@ class UndefinedMissingPersonAdmin(admin.ModelAdmin):
         'caste',
         'marital_status',
         'religion',
-        'is_active',
+        
+        
     )
-    search_fields = ('full_name', 'contact_number', 'reporting_person_name')
+    search_fields = ('full_name', 'contact_number',)
     list_filter = ('gender', 'caste', 'marital_status', 'is_active')
     ordering = ('-created_date',)
 
@@ -100,7 +101,7 @@ class UndefinedMissingPersonAdmin(admin.ModelAdmin):
     )
 
 # Register the model with the admin site
-admin.site.register(UndefinedMissingPerson, UndefinedMissingPersonAdmin)
+admin.site.register(UnidentifiedMissingPerson, UnidentifiedMissingPersonAdmin)
 admin.site.register(Volunteer, VolunteerAdmin)
 admin.site.register(Contact, ContactAdmin)
 admin.site.register(Address, AddressAdmin)
@@ -108,11 +109,23 @@ admin.site.register(UnidentifiedBody, UnidentifiedBodyAdmin)
 admin.site.register(MissingPerson, MissingPersonAdmin)
 
 
-
 class MatchAdmin(admin.ModelAdmin):
-    list_display = ('missing_person', 'undefined_missing_person', 'unidentified_body', 'match_percentage')
+    list_display = ('get_missing_person', 'get_undefined_missing_person', 'get_unidentified_body', 'match_percentage')
     list_filter = ('match_percentage',)
     search_fields = ('missing_person__full_name', 'undefined_missing_person__full_name', 'unidentified_body__full_name')
+
+    # Custom display methods
+    def get_missing_person(self, obj):
+        return obj.missing_person.full_name if obj.missing_person else "No Match"
+    get_missing_person.short_description = 'Missing Person'
+
+    def get_undefined_missing_person(self, obj):
+        return obj.undefined_missing_person.full_name if obj.undefined_missing_person else "No Match"
+    get_undefined_missing_person.short_description = 'Undefined Missing Person'
+
+    def get_unidentified_body(self, obj):
+        return obj.unidentified_body.full_name if obj.unidentified_body else "No Match"
+    get_unidentified_body.short_description = 'Unidentified Body'
 
 admin.site.register(Match, MatchAdmin)
 
@@ -151,47 +164,47 @@ admin.site.register(Match, MatchAdmin)
 
 
 
-from .models import Zone, Division, SubDivision, PoliceStation, Chowki, Hospital
+# from .models import Zone, Division, SubDivision, PoliceStation, Chowki, Hospital
 
-# Admin for Chowki (Outpost)
-class ChowkiAdmin(admin.ModelAdmin):
-    list_display = ('name', 'police_station')
-    search_fields = ('name',)
-    list_filter = ('police_station__name',)
+# # Admin for Chowki (Outpost)
+# class ChowkiAdmin(admin.ModelAdmin):
+#     list_display = ('name', 'police_station')
+#     search_fields = ('name',)
+#     list_filter = ('police_station__name',)
 
-# Admin for Police Station
-class PoliceStationAdmin(admin.ModelAdmin):
-    list_display = ('name', 'division')
-    search_fields = ('name',)
-    list_filter = ('division__name', 'division__zone__name')
+# # Admin for Police Station
+# class PoliceStationAdmin(admin.ModelAdmin):
+#     list_display = ('name', 'division')
+#     search_fields = ('name',)
+#     list_filter = ('division__name', 'division__zone__name')
 
-# Admin for SubDivision
-class SubDivisionAdmin(admin.ModelAdmin):
-    list_display = ('name', 'division')
-    search_fields = ('name',)
-    list_filter = ('division__name', 'division__zone__name')
+# # Admin for SubDivision
+# class SubDivisionAdmin(admin.ModelAdmin):
+#     list_display = ('name', 'division')
+#     search_fields = ('name',)
+#     list_filter = ('division__name', 'division__zone__name')
 
-# Admin for Hospital
-class HospitalAdmin(admin.ModelAdmin):
-    list_display = ('name', 'division', 'entity_type')
-    search_fields = ('name',)
-    list_filter = ('division__name', 'entity_type')
+# # Admin for Hospital
+# class HospitalAdmin(admin.ModelAdmin):
+#     list_display = ('name', 'division', 'entity_type')
+#     search_fields = ('name',)
+#     list_filter = ('division__name', 'entity_type')
 
-# Admin for Division
-class DivisionAdmin(admin.ModelAdmin):
-    list_display = ('name', 'zone')
-    search_fields = ('name',)
-    list_filter = ('zone__name',)
+# # Admin for Division
+# class DivisionAdmin(admin.ModelAdmin):
+#     list_display = ('name', 'zone')
+#     search_fields = ('name',)
+#     list_filter = ('zone__name',)
 
-# Admin for Zone
-class ZoneAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
+# # Admin for Zone
+# class ZoneAdmin(admin.ModelAdmin):
+#     list_display = ('name',)
+#     search_fields = ('name',)
 
-# Register the models and their admin views
-# admin.site.register(Zone, ZoneAdmin)
-# admin.site.register(Division, DivisionAdmin)
-# admin.site.register(SubDivision, SubDivisionAdmin)
-# admin.site.register(PoliceStation, PoliceStationAdmin)
-# admin.site.register(Chowki, ChowkiAdmin)
-# admin.site.register(Hospital, HospitalAdmin)
+# # Register the models and their admin views
+# # admin.site.register(Zone, ZoneAdmin)
+# # admin.site.register(Division, DivisionAdmin)
+# # admin.site.register(SubDivision, SubDivisionAdmin)
+# # admin.site.register(PoliceStation, PoliceStationAdmin)
+# # admin.site.register(Chowki, ChowkiAdmin)
+# # admin.site.register(Hospital, HospitalAdmin)

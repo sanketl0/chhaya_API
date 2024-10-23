@@ -1,4 +1,6 @@
+
 from django.db import models
+from django.utils import timezone
 
 
 class Contact(models.Model):
@@ -357,7 +359,7 @@ class UnidentifiedBody(models.Model):
     is_deleted = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Unidentified Body: {self.full_name or 'Unknown'}"
+        return f" {self.full_name or 'Unknown'}"
 
 class Volunteer(models.Model):
     
@@ -431,7 +433,7 @@ class Volunteer(models.Model):
     def __str__(self):
         return self.full_name 
 
-class UndefinedMissingPerson(models.Model):
+class UnidentifiedMissingPerson(models.Model):
     GENDER_CHOICES = [
         ('Male', 'Male'),
         ('Female', 'Female'),
@@ -501,10 +503,7 @@ class UndefinedMissingPerson(models.Model):
         ('Injured', 'Injured'),
         ('Other', 'Other'),
     ]
-    Condition_GROUP_CHOICES=[
-        ('Memory loss', 'Memory loss'),
-        ('Shock', 'Shock'),
-    ]
+   
     
 
     full_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="Full Name")
@@ -538,8 +537,7 @@ class UndefinedMissingPerson(models.Model):
     special_skills = models.TextField(blank=True, null=True, verbose_name="Special Skills")
     previous_search_experience = models.TextField(blank=True, null=True, verbose_name="Details of Previous Search Experience")
     upload_evidence = models.FileField(upload_to='evidence/', blank=True, null=True, verbose_name="Upload Evidence (e.g., photos, notes)")
-    Condition = models.CharField(max_length=20, choices=Condition_GROUP_CHOICES, null=True, blank=True)
-
+    founded_data = models.DateTimeField()
     address = models.ForeignKey(Address, on_delete=models.CASCADE, related_name='Undefined_missing_person', null=True)
     contact = models.ForeignKey(Contact, on_delete=models.CASCADE, related_name='Undefined_missing_person', null=True)
     is_deleted = models.BooleanField(default=False)
@@ -552,8 +550,8 @@ class UndefinedMissingPerson(models.Model):
         return f" {self.full_name or 'Unknown'}"
 
 class Match(models.Model):
-    missing_person = models.ForeignKey(MissingPerson, on_delete=models.CASCADE)
-    undefined_missing_person = models.ForeignKey(UndefinedMissingPerson, null=True, blank=True, on_delete=models.CASCADE)
+    missing_person = models.ForeignKey(MissingPerson, on_delete=models.CASCADE,)
+    undefined_missing_person = models.ForeignKey(UnidentifiedMissingPerson, null=True, blank=True, on_delete=models.CASCADE)
     unidentified_body = models.ForeignKey(UnidentifiedBody, null=True, blank=True, on_delete=models.CASCADE)
     match_percentage = models.FloatField()
 
@@ -625,51 +623,51 @@ class Match(models.Model):
 
 
 
-# Zone model
-class Zone(models.Model):
-    name = models.CharField(max_length=255)
+# # Zone model
+# class Zone(models.Model):
+#     name = models.CharField(max_length=255)
 
-    def __str__(self):
-        return self.name
+#     def __str__(self):
+#         return self.name
 
-# Division model (one-to-many relationship with Zone)
-class Division(models.Model):
-    name = models.CharField(max_length=255)
-    zone = models.ForeignKey(Zone, related_name='divisions', on_delete=models.CASCADE)
+# # Division model (one-to-many relationship with Zone)
+# class Division(models.Model):
+#     name = models.CharField(max_length=255)
+#     zone = models.ForeignKey(Zone, related_name='divisions', on_delete=models.CASCADE)
 
-    def __str__(self):
-        return f"{self.name} ({self.zone.name})"
+#     def __str__(self):
+#         return f"{self.name} ({self.zone.name})"
 
-# Sub-Division model (belongs to a Division)
-class SubDivision(models.Model):
-    name = models.CharField(max_length=255)
-    division = models.ForeignKey(Division, related_name='sub_divisions', on_delete=models.CASCADE)
+# # Sub-Division model (belongs to a Division)
+# class SubDivision(models.Model):
+#     name = models.CharField(max_length=255)
+#     division = models.ForeignKey(Division, related_name='sub_divisions', on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.name
+#     def __str__(self):
+#         return self.name
 
-# Police Station model (belongs to a Division)
-class PoliceStation(models.Model):
-    name = models.CharField(max_length=255)
-    division = models.ForeignKey(Division, related_name='police_stations', on_delete=models.CASCADE)
+# # Police Station model (belongs to a Division)
+# class PoliceStation(models.Model):
+#     name = models.CharField(max_length=255)
+#     division = models.ForeignKey(Division, related_name='police_stations', on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.name
+#     def __str__(self):
+#         return self.name
 
-# Chowki (Outpost) model (belongs to a Police Station)
-class Chowki(models.Model):
-    name = models.CharField(max_length=255)
-    police_station = models.ForeignKey(PoliceStation, related_name='chowkis', on_delete=models.CASCADE)
+# # Chowki (Outpost) model (belongs to a Police Station)
+# class Chowki(models.Model):
+#     name = models.CharField(max_length=255)
+#     police_station = models.ForeignKey(PoliceStation, related_name='chowkis', on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.name
+#     def __str__(self):
+#         return self.name
 
-# Hospital model (belongs to a Division)
-class Hospital(models.Model):
-    name = models.CharField(max_length=255)
-    division = models.ForeignKey(Division, related_name='hospitals', on_delete=models.CASCADE)
-    entity_type = models.CharField(max_length=255, choices=[('Government', 'Government'), ('Private', 'Private')])
+# # Hospital model (belongs to a Division)
+# class Hospital(models.Model):
+#     name = models.CharField(max_length=255)
+#     division = models.ForeignKey(Division, related_name='hospitals', on_delete=models.CASCADE)
+#     entity_type = models.CharField(max_length=255, choices=[('Government', 'Government'), ('Private', 'Private')])
 
-    def __str__(self):
-        return f"{self.name} ({self.entity_type})"
+#     def __str__(self):
+#         return f"{self.name} ({self.entity_type})"
 

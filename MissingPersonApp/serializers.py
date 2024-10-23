@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Address, Contact, MissingPerson, UndefinedMissingPerson, Volunteer ,UnidentifiedBody
+from .models import Address, Contact, MissingPerson, UnidentifiedMissingPerson, Volunteer ,UnidentifiedBody
 from datetime import date
 
 class ContactSerializer(serializers.ModelSerializer):
@@ -158,7 +158,7 @@ class UndefinedMissingpersonSerializer(serializers.ModelSerializer):
     contact = ContactSerializer()  # Nested serializer for Contact
 
     class Meta:
-        model = UndefinedMissingPerson
+        model = UnidentifiedMissingPerson
         fields = '__all__' 
 
     def create(self, validated_data):
@@ -171,7 +171,7 @@ class UndefinedMissingpersonSerializer(serializers.ModelSerializer):
         contact = Contact.objects.create(**contact_data)
 
         # Create PersonalDetails instance with the created Address and Contact
-        personal_details = UndefinedMissingPerson.objects.create(
+        personal_details = UnidentifiedMissingPerson.objects.create(
             address=address,
             contact=contact,
             **validated_data
@@ -220,51 +220,51 @@ class UndefinedMissingpersonSerializer(serializers.ModelSerializer):
     
     
     
-from .models import Zone, Division, SubDivision, PoliceStation, Chowki, Hospital
+# from .models import Zone, Division, SubDivision, PoliceStation, Chowki, Hospital
 
-# Chowki Serializer
-class ChowkiSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Chowki
-        fields = ['id', 'name', 'police_station']
+# # Chowki Serializer
+# class ChowkiSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Chowki
+#         fields = ['id', 'name', 'police_station']
 
-# Police Station Serializer with Nested Chowkis
-class PoliceStationSerializer(serializers.ModelSerializer):
-    chowkis = ChowkiSerializer(many=True, read_only=True)
+# # Police Station Serializer with Nested Chowkis
+# class PoliceStationSerializer(serializers.ModelSerializer):
+#     chowkis = ChowkiSerializer(many=True, read_only=True)
 
-    class Meta:
-        model = PoliceStation
-        fields = ['id', 'name', 'division', 'chowkis']
+#     class Meta:
+#         model = PoliceStation
+#         fields = ['id', 'name', 'division', 'chowkis']
 
-# Sub-Division Serializer
-class SubDivisionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SubDivision
-        fields = ['id', 'name', 'division']
+# # Sub-Division Serializer
+# class SubDivisionSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = SubDivision
+#         fields = ['id', 'name', 'division']
 
-# Hospital Serializer
-class HospitalSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Hospital
-        fields = ['id', 'name', 'division', 'entity_type']
+# # Hospital Serializer
+# class HospitalSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Hospital
+#         fields = ['id', 'name', 'division', 'entity_type']
 
-# Division Serializer with Nested Police Stations, SubDivisions, and Hospitals
-class DivisionSerializer(serializers.ModelSerializer):
-    police_stations = PoliceStationSerializer(many=True, read_only=True)
-    sub_divisions = SubDivisionSerializer(many=True, read_only=True)
-    hospitals = HospitalSerializer(many=True, read_only=True)
+# # Division Serializer with Nested Police Stations, SubDivisions, and Hospitals
+# class DivisionSerializer(serializers.ModelSerializer):
+#     police_stations = PoliceStationSerializer(many=True, read_only=True)
+#     sub_divisions = SubDivisionSerializer(many=True, read_only=True)
+#     hospitals = HospitalSerializer(many=True, read_only=True)
 
-    class Meta:
-        model = Division
-        fields = ['id', 'name', 'zone', 'police_stations', 'sub_divisions', 'hospitals']
+#     class Meta:
+#         model = Division
+#         fields = ['id', 'name', 'zone', 'police_stations', 'sub_divisions', 'hospitals']
 
-# Zone Serializer with Nested Divisions
-class ZoneSerializer(serializers.ModelSerializer):
-    divisions = DivisionSerializer(many=True, read_only=True)
+# # Zone Serializer with Nested Divisions
+# class ZoneSerializer(serializers.ModelSerializer):
+#     divisions = DivisionSerializer(many=True, read_only=True)
 
-    class Meta:
-        model = Zone
-        fields = ['id', 'name', 'divisions']
+#     class Meta:
+#         model = Zone
+#         fields = ['id', 'name', 'divisions']
 
     
     
