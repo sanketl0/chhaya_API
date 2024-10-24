@@ -78,7 +78,6 @@ class Address(models.Model):
     def __str__(self):
         return f"{self.street}, {self.city}, {self.state} - {self.postal_code}"
 
-
 class MissingPerson(models.Model):
     
     GENDER_CHOICES = [
@@ -270,7 +269,6 @@ class MissingPerson(models.Model):
     
     def __str__(self):
         return self.full_name
-
 
 class UnidentifiedBody(models.Model):
     
@@ -471,30 +469,30 @@ class UnidentifiedMissingPerson(models.Model):
 
     CASTE_CHOICES = [
         ('Open', 'Open'),
-        ('SC', 'Scheduled Caste'),
-        ('ST', 'Scheduled Tribe'),
-        # Add more options as needed
+        ('SC', 'SC'),
+        ('ST', 'ST'),
+        
     ]
 
     MARITAL_STATUS_CHOICES = [
         ('Single', 'Single'),
         ('Married', 'Married'),
         ('Widowed', 'Widowed'),
-        # Add more options as needed
+        
     ]
 
     RELIGION_CHOICES = [
         ('Hindu', 'Hindu'),
         ('Muslim', 'Muslim'),
         ('Sikh', 'Sikh'),
-        # Add more options as needed
+       
     ]
 
     LANGUAGE_CHOICES = [
         ('Hindi', 'Hindi'),
         ('Marathi', 'Marathi'),
         ('Bengali', 'Bengali'),
-        # Add other languages as needed
+        
     ]
 
     CONDITION_CHOICES = [
@@ -537,7 +535,7 @@ class UnidentifiedMissingPerson(models.Model):
     special_skills = models.TextField(blank=True, null=True, verbose_name="Special Skills")
     previous_search_experience = models.TextField(blank=True, null=True, verbose_name="Details of Previous Search Experience")
     upload_evidence = models.FileField(upload_to='evidence/', blank=True, null=True, verbose_name="Upload Evidence (e.g., photos, notes)")
-    founded_data = models.DateTimeField()
+    # date_of_foundend = models.DateField()
     address = models.ForeignKey(Address, on_delete=models.CASCADE, related_name='Undefined_missing_person', null=True)
     contact = models.ForeignKey(Contact, on_delete=models.CASCADE, related_name='Undefined_missing_person', null=True)
     is_deleted = models.BooleanField(default=False)
@@ -550,7 +548,7 @@ class UnidentifiedMissingPerson(models.Model):
         return f" {self.full_name or 'Unknown'}"
 
 class Match(models.Model):
-    missing_person = models.ForeignKey(MissingPerson, on_delete=models.CASCADE,)
+    missing_person = models.ForeignKey(MissingPerson, on_delete=models.CASCADE,null=True, blank=True,)
     undefined_missing_person = models.ForeignKey(UnidentifiedMissingPerson, null=True, blank=True, on_delete=models.CASCADE)
     unidentified_body = models.ForeignKey(UnidentifiedBody, null=True, blank=True, on_delete=models.CASCADE)
     match_percentage = models.FloatField()

@@ -10,8 +10,7 @@ class VolunteerAdmin(admin.ModelAdmin):
     search_fields = ('full_name', 'contact_numbers', 'email_address')
     list_filter = ('gender', 'blood_group', 'is_active')
     ordering = ('full_name',)
-    list_editable = ('is_active',)
-    
+    list_editable = ('is_active',) 
 
 class ContactAdmin(admin.ModelAdmin):
     list_display = ( 'type','phone_number', 'email', 'is_primary')
@@ -63,6 +62,7 @@ class UnidentifiedMissingPersonAdmin(admin.ModelAdmin):
     list_display = (
         'full_name',
         'estimated_age',
+        
         'gender',
         'height',
         'weight',

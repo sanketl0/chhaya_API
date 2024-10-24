@@ -1,7 +1,10 @@
+import os
 from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+
+from MissingPersonApp.photo_match import is_face_match
 from .models import  MissingPerson, UnidentifiedMissingPerson, UnidentifiedBody, Volunteer ,Match
 from .serializers import MissingPersonSerializer, UndefinedMissingpersonSerializer, UnidentifiedBodySerializer, VolunteerSerializer
 from django.core.exceptions import ObjectDoesNotExist
@@ -369,14 +372,14 @@ class SearchAllMatches(APIView):
                     results.append({
                         'missing_person_name': missing_person.full_name,
                         'match_type': 'Missing Person vs Undefined Missing Person',
-                        'undefined_missing_person_name': undefined_missing_person.full_name if is_match else "No Match",
-                        'match_percentage': match_percentage if is_match else 0
+                        'undefined_missing_person_name': undefined_missing_person.full_name,
+                        'match_percentage': match_percentage
                     })
                     # Save match result, ensuring foreign keys are valid
                     Match.objects.create(
-                        missing_person=missing_person if is_match else None,
-                        undefined_missing_person=undefined_missing_person if is_match else None,
-                        match_percentage=match_percentage if is_match else 0
+                        missing_person=missing_person,
+                        undefined_missing_person=undefined_missing_person,
+                        match_percentage=match_percentage
                     )
 
             # Missing Person vs Unidentified Dead Body
@@ -387,14 +390,14 @@ class SearchAllMatches(APIView):
                     results.append({
                         'missing_person_name': missing_person.full_name,
                         'match_type': 'Missing Person vs Unidentified Dead Body',
-                        'unidentified_body_name': unidentified_body.full_name if is_match else "No Match",
-                        'match_percentage': match_percentage if is_match else 0
+                        'unidentified_body_name': unidentified_body.full_name,
+                        'match_percentage': match_percentage,
                     })
                     # Save match result
                     Match.objects.create(
-                        missing_person=missing_person if is_match else None,
-                        unidentified_body=unidentified_body if is_match else None,
-                        match_percentage=match_percentage if is_match else 0
+                        missing_person=missing_person,
+                        unidentified_body=unidentified_body,
+                        match_percentage=match_percentage 
                     )
 
         # Undefined Missing Person vs Unidentified Dead Body
@@ -406,14 +409,14 @@ class SearchAllMatches(APIView):
                     results.append({
                         'undefined_missing_person_name': undefined_missing_person.full_name,
                         'match_type': 'Undefined Missing Person vs Unidentified Dead Body',
-                        'unidentified_body_name': unidentified_body.full_name if is_match else "No Match",
-                        'match_percentage': match_percentage if is_match else 0
+                        'unidentified_body_name': unidentified_body.full_name ,
+                        'match_percentage': match_percentage
                     })
                     # Save match result
                     Match.objects.create(
-                        undefined_missing_person=undefined_missing_person if is_match else None,
-                        unidentified_body=unidentified_body if is_match else None,
-                        match_percentage=match_percentage if is_match else 0
+                        undefined_missing_person=undefined_missing_person,
+                        unidentified_body=unidentified_body,
+                        match_percentage=match_percentage 
                     )
 
         # Response logic
@@ -513,11 +516,15 @@ class SearchAllMatches(APIView):
             if missing_person.caste.lower() == UndefinedMissingPerson.caste.lower():
                 match_score += 1
 
-        # 14. photo Number - Exact Match
-        if missing_person.photo_upload and UndefinedMissingPerson.photo_upload:
-            total_checks += 1
-            if missing_person.photo_upload == UndefinedMissingPerson.photo_upload:
-                match_score += 1
+        # 14. photo - Exact Match
+        # if missing_person.photo_upload and UndefinedMissingPerson.photo_upload:
+        #     total_checks += 1
+        #     image1_path = str(missing_person.photo_upload.path)
+        #     image2_path = str(UndefinedMissingPerson.photo_upload.path)
+
+        #     if os.path.exists(image1_path) and os.path.exists(image2_path):
+        #         if is_face_match(image1_path, image2_path):
+        #             match_score += 1
 
         # 15. Identification Details - Direct Verification (e.g., Aadhar, PAN)
         if missing_person.identification_card_no and UndefinedMissingPerson.identification_details:
@@ -638,11 +645,70 @@ class SearchAllMatches(APIView):
             if undefined_missing_person.full_name.lower() == unidentified_body.full_name.lower():
                 match_score += 1  # Exact match
 
+        if undefined_missing_person.gender and unidentified_body.gender:
+            total_checks += 1
+            if undefined_missing_person.gender == unidentified_body.gender:
+                match_score += 1
         
+        if undefined_missing_person.height and unidentified_body.height:
+            total_checks += 1
+            if abs(undefined_missing_person.height - unidentified_body.height) <= 5:  # Allow height range ±5 cm
+                match_score += 1
+                
+        if undefined_missing_person.weight and unidentified_body.weight:
+            total_checks += 1
+            if abs(undefined_missing_person.weight - unidentified_body.weight) <= 5:  # Allow weight range ±5 kg
+                match_score += 1
+
+        # 6. Complexion - Exact Match
+        if undefined_missing_person.complexion and unidentified_body.complexion:
+            total_checks += 1
+            if undefined_missing_person.complexion.lower() == unidentified_body.complexion.lower():
+                match_score += 1
+
+        # 7. Hair Color - Exact Match
+        if undefined_missing_person.hair_color and unidentified_body.hair_color:
+            total_checks += 1
+            if undefined_missing_person.hair_color.lower() == unidentified_body.hair_color.lower():
+                match_score += 1
+
+        # 8. Hair Type - Exact Match
+        if undefined_missing_person.hair_type and unidentified_body.hair_type:
+            total_checks += 1
+            if undefined_missing_person.hair_type.lower() == unidentified_body.hair_type.lower():
+                match_score += 1
+
+        # 9. Eye Color - Exact Match
+        if undefined_missing_person.eye_color and unidentified_body.eye_color:
+            total_checks += 1
+            if undefined_missing_person.eye_color.lower() == unidentified_body.eye_color.lower():
+                match_score += 1
+
+        # 10. Birth Mark - Exact Match
+        if undefined_missing_person.birth_mark and unidentified_body.birth_mark:
+            total_checks += 1
+            if undefined_missing_person.birth_mark.lower() == unidentified_body.birth_mark.lower():
+                match_score += 1
+                
+        if undefined_missing_person.last_seen_details and unidentified_body.last_seen_details:
+            total_checks += 1
+            if undefined_missing_person.last_seen_details.lower() == unidentified_body.last_seen_details.lower():
+                match_score += 1
+                
+        if undefined_missing_person.photo_upload and unidentified_body.body_photo_upload:
+            total_checks += 1
+    
+            image1_path = str(undefined_missing_person.photo_upload.path)
+            image2_path = str(unidentified_body.body_photo_upload.path)
+
+            if os.path.exists(image1_path) and os.path.exists(image2_path):
+                if is_face_match(image1_path, image2_path):
+                    match_score += 1
+
 
         # Calculate match percentage
         match_percentage = (match_score / total_checks) * 100 if total_checks > 0 else 0
-        return match_percentage >= 50, match_percentage  # Return if it's a match and the match percentage
+        return match_percentage >= 50, match_percentage 
 
 
     

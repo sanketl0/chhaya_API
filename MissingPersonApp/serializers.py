@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Address, Contact, MissingPerson, UnidentifiedMissingPerson, Volunteer ,UnidentifiedBody
+from .models import Address, Contact, MissingPerson, UnidentifiedMissingPerson, Volunteer ,UnidentifiedBody,Match
 from datetime import date
 
 class ContactSerializer(serializers.ModelSerializer):
@@ -154,8 +154,8 @@ class VolunteerSerializer(serializers.ModelSerializer):
     
     
 class UndefinedMissingpersonSerializer(serializers.ModelSerializer):
-    address = AddressSerializer()  # Nested serializer for Address
-    contact = ContactSerializer()  # Nested serializer for Contact
+    address = AddressSerializer()  
+    contact = ContactSerializer()  
 
     class Meta:
         model = UnidentifiedMissingPerson
@@ -167,10 +167,9 @@ class UndefinedMissingpersonSerializer(serializers.ModelSerializer):
 
         # Create Address instance
         address = Address.objects.create(**address_data)
-        # Create Contact instance
         contact = Contact.objects.create(**contact_data)
 
-        # Create PersonalDetails instance with the created Address and Contact
+        # Create unidentified missing person instance with the created Address and Contact
         personal_details = UnidentifiedMissingPerson.objects.create(
             address=address,
             contact=contact,
@@ -202,6 +201,18 @@ class UndefinedMissingpersonSerializer(serializers.ModelSerializer):
         instance.save()
         return instance 
     
+class MatchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Match
+        fields = ['missing_person', 'undefined_missing_person', 'unidentified_body', 'match_percentage']
+
+    def create(self, validated_data):
+        missing_person = validated_data.get('missing_person')
+        if not missing_person:
+            raise serializers.ValidationError("missing_person cannot be null.")
+
+        return super().create(validated_data)
+
     
     
     
